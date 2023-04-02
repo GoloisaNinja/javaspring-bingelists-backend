@@ -66,11 +66,18 @@ public class BingeList {
     }
 
     public boolean addUserToBingeList(String id) {
-        //ObjectId idAsObj = new ObjectId(id);
         if (this.listUsers.contains(id)) {
             return false;
         }
         this.listUsers.add(id);
+        return true;
+    }
+
+    public boolean removeUserFromBingeList(String id) {
+        if (!this.listUsers.contains(id)) {
+            return false;
+        }
+        this.listUsers.remove(id);
         return true;
     }
 }

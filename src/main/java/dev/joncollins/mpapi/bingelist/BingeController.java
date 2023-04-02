@@ -51,10 +51,14 @@ public class BingeController {
             return ResponseEntity.status(e.getStatusCode()).body(e.getStatusText());
         }
     }
-    @PostMapping("/add/user")
-    public ResponseEntity<BingeList> addUserToBingeList(@RequestParam String id,
+
+    // A bingelist owner revokes a user that they previously invited successfully
+    @PostMapping("/remove/user")
+    public ResponseEntity<BingeList> removeUserFromBingeList(@RequestParam Map<String, String> params,
                                                         @RequestHeader(HttpHeaders.AUTHORIZATION) String auth) {
-        return ResponseEntity.ok(bingeService.addUserToBingeList(id, auth));
+        String userToRemoveId = params.get("userId");
+        String listId = params.get("listId");
+        return ResponseEntity.ok(bingeService.removeUserFromBingeList(userToRemoveId, listId, auth));
     }
     @GetMapping
     public ResponseEntity<BingeList> fetchBingeListById(@RequestParam String id,

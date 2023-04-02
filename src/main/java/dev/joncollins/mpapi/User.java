@@ -78,10 +78,20 @@ public class User implements UserDetails {
         return this.tokens.stream().filter((t) -> !t.expired && !t.revoked).toList();
     }
 
-    public void deleteInvite(Invite i) {
+    public boolean addInvite(Invite i) {
         if (this.invites.contains(i)) {
-            this.invites.remove(i);
+            return false;
         }
+        this.invites.add(i);
+        return true;
+    }
+
+    public boolean deleteInvite(Invite i) {
+        if (!this.invites.contains(i)) {
+            return false;
+        }
+        this.invites.remove(i);
+        return true;
     }
 
 }

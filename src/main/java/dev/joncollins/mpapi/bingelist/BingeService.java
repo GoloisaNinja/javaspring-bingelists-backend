@@ -22,8 +22,6 @@ import java.util.NoSuchElementException;
 @Service
 public class BingeService implements GsonTypeAdapter {
     private BingeRepository repo;
-    private UserRepository userRepo;
-    private InviteRepository inviteRepo;
     private AuthService authService;
 
     public BingeList createBingeList(String name, String auth) throws HttpStatusCodeException {
@@ -100,30 +98,35 @@ public class BingeService implements GsonTypeAdapter {
         }
     }
 
-    public BingeList addUserToBingeList(String id, String auth) throws HttpClientErrorException {
-        User invitedUser = authService.returnUserDetailsByToken(auth);
-        if (invitedUser == null) {
+    public boolean addUserToBingeList(String listId, String userToAddId) {
+        BingeList list = repo.findById(listId).orElse(null);
+        if (list == null) {
+            return false;
+        }
+        // Add the invited user to the bingelist
+        boolean added = list.addUserToBingeList(userToAddId);
+        if (!added) {
+            return false;
+        }
+        repo.save(list);
+        return true;
+    }
+
+    public BingeList removeUserFromBingeList(String id, String listId, String auth) throws HttpClientErrorException {
+        User listOwner = authService.returnUserDetailsByToken(auth);
+        if (listOwner == null) {
             throw new NoSuchElementException();
         }
-        Invite invite = inviteRepo.findInviteByIdAndInvitedUserId(id, invitedUser.getId()).orElse(null);
-        if (invite == null) {
-            throw new NoSuchElementException();
-        }
-        BingeList list = repo.findBingeListByIdAndOwner(invite.getBingeListId(), invite.getInvitedById()).orElse(null);
+        BingeList list = repo.findBingeListByIdAndOwner(listId, listOwner.getId()).orElse(null);
         if (list == null) {
             throw new NoSuchElementException();
         }
         // Add the invited user to the bingelist
-        boolean added = list.addUserToBingeList(invitedUser.getId());
-        if (!added) {
-            throw new HttpClientErrorException(HttpStatusCode.valueOf(400), "couldn't add user");
+        boolean removed = list.removeUserFromBingeList(id);
+        if (!removed) {
+            throw new HttpClientErrorException(HttpStatusCode.valueOf(400), "couldn't remove user");
         }
         repo.save(list);
-        // Delete the invite from the invitedUser and save
-        invitedUser.deleteInvite(invite);
-        userRepo.save(invitedUser);
-        // Delete the invite from the Invite Repository
-        inviteRepo.delete(invite);
         return list;
     }
 }
