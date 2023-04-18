@@ -47,7 +47,7 @@ public class AuthService {
                 .build();
     }
 
-    public AuthResponse authenticate(AuthRequest req) {
+    public PrivateUserResponse authenticate(AuthRequest req) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         req.getEmail(),
@@ -58,9 +58,14 @@ public class AuthService {
         var jwtToken = jwtService.generateToken(user);
         revokeAllUserTokens(user);
         saveUserToken(user, jwtToken);
-        return AuthResponse.builder()
-                .token(jwtToken)
-                .build();
+        return PrivateUserResponse.builder()
+                                  .id(user.getId())
+                                  .name(user.getFirstName())
+                                  .email(user.getEmail())
+                                  .token(jwtToken)
+                                  .invites(user.getInvites())
+                                  .createdAt(user.getCreatedAt())
+                                  .build();
     }
 
     private void saveUserToken(User user, String jwtToken) {
@@ -99,38 +104,35 @@ public class AuthService {
     public User returnUserDetailsByToken(String authHeader) {
         String token = authHeader.substring(7);
         String userEmail = jwtService.extractUsername(token);
-        User user = repo.findUserByEmail(userEmail).orElse(null);
-        //User user = repo.findUsersByEmailExcludePasswordAndTokens(userEmail).orElse(null);
-        return user;
+        return repo.findUserByEmail(userEmail).orElse(null);
     }
 
-    public UserResponse getUserByToken(String auth) {
+    public PublicUserResponse getUserByToken(String auth) {
         User user = returnUserDetailsByToken(auth);
         if (user == null) {
             throw new NoSuchElementException();
         }
-        return UserResponse.builder()
-                .id(user.getId())
-                .name(user.getFirstName())
-                .isPrivate(user.getIsPrivate())
-                .invites(user.getInvites())
-                .createdAt(user.getCreatedAt())
-                .build();
+        return PublicUserResponse.builder()
+                                 .id(user.getId())
+                                 .name(user.getFirstName())
+                                 .isPrivate(user.getIsPrivate())
+                                 .createdAt(user.getCreatedAt())
+                                 .build();
     }
 
-    public List<UserResponse> getUsersByPrivacy() {
+    public List<PublicUserResponse> getUsersByPrivacy() {
         List<User> users = repo.findUsersByIsPrivate().orElse(null);
         if (users == null) {
             throw new NoSuchElementException();
         }
-        List<UserResponse> userList = new ArrayList<>();
+        List<PublicUserResponse> userList = new ArrayList<>();
         for (User user : users) {
-            var resp = UserResponse.builder()
-                    .id(user.getId())
-                    .name(user.getFirstName())
-                    .isPrivate(user.getIsPrivate())
-                    .createdAt(user.getCreatedAt())
-                    .build();
+            var resp = PublicUserResponse.builder()
+                                         .id(user.getId())
+                                         .name(user.getFirstName())
+                                         .isPrivate(user.getIsPrivate())
+                                         .createdAt(user.getCreatedAt())
+                                         .build();
             userList.add(resp);
         }
         return userList;

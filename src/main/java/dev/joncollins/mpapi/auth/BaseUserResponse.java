@@ -1,23 +1,21 @@
 package dev.joncollins.mpapi.auth;
 
 import dev.joncollins.mpapi.Invite;
-import dev.joncollins.mpapi.User;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
-@Builder
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserResponse {
+public abstract class BaseUserResponse {
     private String id;
     private String name;
-    private Boolean isPrivate;
-    private List<Invite> invites;
+    private boolean isPrivate;
     private LocalDateTime createdAt;
 }

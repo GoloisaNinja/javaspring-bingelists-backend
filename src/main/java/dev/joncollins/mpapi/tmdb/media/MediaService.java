@@ -16,7 +16,7 @@ import java.util.*;
 public class MediaService extends ResReq implements GsonTypeAdapter {
     private HttpClient client = HttpClient.newHttpClient();
 
-    public Map<String,Map<String, Object>> fetchAllMediaAttributes(String media_type, String media_id) {
+    public Map<String,Map<String, Object>> fetchAllMediaAttributes(String media_type, String media_id) throws ServerErrorException {
         String base = "/" + media_type + "/" + media_id;
         // string endpoints
         String mediaEndpoint = base + "?append_to_response=videos&api_key=";

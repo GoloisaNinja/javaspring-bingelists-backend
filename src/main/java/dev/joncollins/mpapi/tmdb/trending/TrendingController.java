@@ -2,16 +2,14 @@ package dev.joncollins.mpapi.tmdb.trending;
 
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ServerErrorException;
 
 import java.util.Map;
 
 @RestController
 @RequestMapping("api/v1/trending")
+@CrossOrigin("http://localhost:3000")
 @AllArgsConstructor
 public class TrendingController {
     private final TrendingService trendingService;
