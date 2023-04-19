@@ -10,6 +10,7 @@ import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.HashMap;
 import java.util.Map;
 
 public abstract class ResReq implements GsonTypeAdapter {
@@ -34,5 +35,14 @@ public abstract class ResReq implements GsonTypeAdapter {
     public Map<String, Object> returnJsonStringAsMap(String json) {
         Gson gson = returnAdaptedGson();
         return gson.fromJson(json, new TypeToken<Map<String, Object>>() {}.getType());
+    }
+
+    public Map<String, Map<String, Object>> combineResponses(Map<String, String> respMap) {
+        Map<String, Map<String, Object>> combinedResponseMap = new HashMap<>();
+        for (String key : respMap.keySet()) {
+            Map<String, Object> jsonObj = returnJsonStringAsMap(respMap.get(key));
+            combinedResponseMap.put(key, jsonObj);
+        }
+        return combinedResponseMap;
     }
 }

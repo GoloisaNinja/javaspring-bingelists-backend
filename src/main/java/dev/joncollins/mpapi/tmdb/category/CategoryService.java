@@ -8,6 +8,8 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class CategoryService extends ResReq implements GsonTypeAdapter {
@@ -24,12 +26,18 @@ public class CategoryService extends ResReq implements GsonTypeAdapter {
         }
         throw new ServerErrorException("internal server error", new Throwable());
     }
-    public String fetchCategoryList(String media_type) {
-        URI catListEndpoint = uriBuilder("/genre/" + media_type + "/list?api_key=");
-        return getString(catListEndpoint);
+    public Map<String, Map<String, Object>> fetchCategoryList() {
+        URI movieCatListEndpoint = uriBuilder("/genre/movie/list?api_key=");
+        URI tvCatListEndpoint = uriBuilder("/genre/tv/list?api_key=");
+        String mCatResult = getString(movieCatListEndpoint);
+        String tvCatResult = getString(tvCatListEndpoint);
+        Map<String, String> respMap = new HashMap<>();
+        respMap.put("movie", mCatResult);
+        respMap.put("tv", tvCatResult);
+        return combineResponses(respMap);
     }
 
-    public String fetchCategoryByTypeAndPage(CategoryRequest req) {
+    public String fetchCategoryByTypeAndPage(CategoryRequest req) throws ServerErrorException {
         String sortStr = req.getSort_by().equals("rating") ?
                 "sort_by=vote_average.desc&vote_count.gte=50" :
                 "sort_by" + "=popularity.desc";
