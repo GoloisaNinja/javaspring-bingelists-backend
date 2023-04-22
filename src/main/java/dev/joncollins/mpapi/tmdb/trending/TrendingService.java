@@ -50,11 +50,9 @@ public class TrendingService extends ResReq {
         else{
             tvBody = tvResp.body();
         }
-        Map<String, Object> tmMap = returnJsonStringAsMap(tmBody);
-        Map<String, Object> tvMap = returnJsonStringAsMap(tvBody);
-        Map<String, Map<String, Object>> combined = new HashMap<>();
-        combined.put("movie", tmMap);
-        combined.put("tv", tvMap);
-        return combined;
+        Map<String, String> respMap = new HashMap<>();
+        respMap.put("movie", tmBody);
+        respMap.put("tv", tvBody);
+        return combineResponses(respMap);
     }
 }

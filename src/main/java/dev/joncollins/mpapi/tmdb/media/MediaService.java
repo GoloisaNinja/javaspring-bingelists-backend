@@ -57,17 +57,12 @@ public class MediaService extends ResReq implements GsonTypeAdapter {
         }
         // create the map and response
         if (mediaResponse != null && mediaResponse.statusCode() == 200) {
-            Map<String, Map<String, Object>> combinedMediaMap = new HashMap<>();
-            Map<String, Object> mediaMap = returnJsonStringAsMap(mBody);
-            Map<String, Object> creditsMap = returnJsonStringAsMap(cBody);
-            Map<String, Object> providersMap = returnJsonStringAsMap(pBody);
-            Map<String, Object> similarsMap = returnJsonStringAsMap(sBody);
-
-            combinedMediaMap.put("media", mediaMap);
-            combinedMediaMap.put("credits", creditsMap);
-            combinedMediaMap.put("providers", providersMap);
-            combinedMediaMap.put("similars", similarsMap);
-            return combinedMediaMap;
+            Map<String, String> respMap = new HashMap<>();
+            respMap.put("media", mBody);
+            respMap.put("credits", cBody);
+            respMap.put("providers", pBody);
+            respMap.put("similars", sBody);
+            return combineResponses(respMap);
         } else {
             throw new ServerErrorException("internal server error", new Throwable());
         }
