@@ -21,13 +21,20 @@ public class BingeController {
     public ResponseEntity<BingeList> createBingeList(@RequestBody Map<String, String> body,
                                                   @RequestHeader(HttpHeaders.AUTHORIZATION) String auth) {
         String name = body.get("name");
-        return ResponseEntity.ok(bingeService.createBingeList(name, auth));
-//        try {
-//            String json = bingeService.createBingeList(name, auth);
-//            return ResponseEntity.ok(json);
-//        } catch(HttpClientErrorException e) {
-//            return ResponseEntity.status(e.getStatusCode()).body(e.getStatusText());
-//        }
+        try {
+            return ResponseEntity.ok(bingeService.createBingeList(name, auth));
+        } catch(HttpClientErrorException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(null);
+        }
+
+    }
+    @DeleteMapping("/delete")
+    public ResponseEntity<String> deleteBingeList(@RequestParam String listId, @RequestHeader(HttpHeaders.AUTHORIZATION) String auth) {
+        try {
+            return ResponseEntity.ok(bingeService.deleteBingeList(listId, auth));
+        } catch(HttpClientErrorException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(e.getStatusText());
+        }
     }
     @PostMapping("/add")
     public ResponseEntity<MediaItem> addMediaItemToBingeList(@RequestParam String id,
@@ -58,7 +65,12 @@ public class BingeController {
                                                         @RequestHeader(HttpHeaders.AUTHORIZATION) String auth) {
         String userToRemoveId = params.get("userId");
         String listId = params.get("listId");
-        return ResponseEntity.ok(bingeService.removeUserFromBingeList(userToRemoveId, listId, auth));
+        try {
+            return ResponseEntity.ok(bingeService.removeUserFromBingeList(userToRemoveId, listId, auth));
+        } catch(HttpClientErrorException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(null);
+        }
+
     }
     @GetMapping
     public ResponseEntity<BingeList> fetchBingeListById(@RequestParam String id,

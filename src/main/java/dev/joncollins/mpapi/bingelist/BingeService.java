@@ -24,7 +24,7 @@ public class BingeService implements GsonTypeAdapter {
     private BingeRepository repo;
     private AuthService authService;
 
-    public BingeList createBingeList(String name, String auth) throws HttpStatusCodeException {
+    public BingeList createBingeList(String name, String auth) throws HttpClientErrorException {
         User user = authService.returnUserDetailsByToken(auth);
         if (user != null) {
             String owner = user.getId();
@@ -34,6 +34,18 @@ public class BingeService implements GsonTypeAdapter {
         } else {
             throw new HttpClientErrorException(HttpStatusCode.valueOf(400), "bad request");
         }
+    }
+    public String deleteBingeList(String listId, String auth) throws HttpClientErrorException {
+        User user = authService.returnUserDetailsByToken(auth);
+        if (user == null) {
+            throw new HttpClientErrorException(HttpStatusCode.valueOf(400), "bad request");
+        }
+        BingeList listToDelete = repo.findBingeListByIdAndOwner(listId, user.getId()).orElse(null);
+        if (listToDelete == null) {
+            throw new HttpClientErrorException(HttpStatusCode.valueOf(400), "bad request");
+        }
+        repo.delete(listToDelete);
+        return "list was deleted successfully";
     }
     public List<BingeList> fetchBingeListsByOwnerAndListUser(String auth) throws HttpClientErrorException {
         User user = authService.returnUserDetailsByToken(auth);
