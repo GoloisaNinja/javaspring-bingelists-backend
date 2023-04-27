@@ -2,6 +2,7 @@ package dev.joncollins.mpapi.bingelist;
 
 import dev.joncollins.mpapi.BingeList;
 import dev.joncollins.mpapi.MediaItem;
+import dev.joncollins.mpapi.MinifiedBingeList;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -86,6 +87,15 @@ public class BingeController {
     public ResponseEntity<List<BingeList>> fetchAllBingeLists(@RequestHeader(HttpHeaders.AUTHORIZATION) String auth) {
         try {
             return ResponseEntity.ok(bingeService.fetchBingeListsByOwnerAndListUser(auth));
+        } catch(HttpClientErrorException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(null);
+        }
+
+    }
+    @GetMapping("/lists/minified")
+    public ResponseEntity<List<MinifiedBingeList>> fetchAllMinifiedBingeLists(@RequestHeader(HttpHeaders.AUTHORIZATION) String auth) {
+        try {
+            return ResponseEntity.ok(bingeService.fetchMinifiedBingeLists(auth));
         } catch(HttpClientErrorException e) {
             return ResponseEntity.status(e.getStatusCode()).body(null);
         }

@@ -6,7 +6,10 @@ import org.springframework.data.annotation.PersistenceConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 @Data
 @Document
 public class BingeList {
@@ -80,4 +83,15 @@ public class BingeList {
         this.listUsers.remove(id);
         return true;
     }
+    public MinifiedBingeList getMinifiedBingeList() {
+        Map<String, List<String>> items = new HashMap<>();
+        items.put("movie", new ArrayList<>());
+        items.put("tv", new ArrayList<>());
+        for (MediaItem title : this.titles) {
+            List<String> listToAddTo = items.get(title.getType());
+            listToAddTo.add(title.getMediaId());
+        }
+        return new MinifiedBingeList(this.id, this.name, items);
+    }
+
 }
