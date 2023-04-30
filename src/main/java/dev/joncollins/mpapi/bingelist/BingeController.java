@@ -49,10 +49,10 @@ public class BingeController {
 
     }
     @PostMapping("/remove")
-    public ResponseEntity<String> removeMediaItemFromBingeList(@RequestParam Map<String, String> params,
+    public ResponseEntity<String> removeMediaItemFromBingeList(@RequestParam String id,
+                                                               @RequestBody MediaItem item,
                                                                @RequestHeader(HttpHeaders.AUTHORIZATION) String auth) {
-        String id = params.get("id");
-        String item = params.get("item");
+
         try {
             return ResponseEntity.ok(bingeService.removeItemFromBingeList(id, item, auth));
         } catch(HttpClientErrorException e) {

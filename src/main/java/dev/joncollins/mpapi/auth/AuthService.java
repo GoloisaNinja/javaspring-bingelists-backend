@@ -1,10 +1,8 @@
 package dev.joncollins.mpapi.auth;
 
-import dev.joncollins.mpapi.Role;
-import dev.joncollins.mpapi.Token;
-import dev.joncollins.mpapi.TokenType;
-import dev.joncollins.mpapi.User;
+import dev.joncollins.mpapi.*;
 import dev.joncollins.mpapi.configuration.JwtService;
+import dev.joncollins.mpapi.repositories.FavoriteRepository;
 import dev.joncollins.mpapi.repositories.TokenRepository;
 import dev.joncollins.mpapi.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +21,7 @@ import java.util.NoSuchElementException;
 @RequiredArgsConstructor
 public class AuthService {
     private final UserRepository repo;
+    private final FavoriteRepository favoriteRepo;
     private final TokenRepository tokenRepo;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
@@ -30,21 +29,26 @@ public class AuthService {
 
     public AuthResponse register(RegisterRequest req) {
         var user = User.builder()
-                .firstName(req.getFirstname())
-                .email(req.getEmail())
-                .password(passwordEncoder.encode(req.getPassword()))
-                .isPrivate(req.getIsPrivateAsBoolean())
-                .tokens(new ArrayList<>())
-                .invites(new ArrayList<>())
-                .role(Role.USER)
-                .createdAt(LocalDateTime.now())
-                .build();
+                       .firstName(req.getFirstname())
+                       .email(req.getEmail())
+                       .password(passwordEncoder.encode(req.getPassword()))
+                       .isPrivate(req.getIsPrivateAsBoolean())
+                       .tokens(new ArrayList<>())
+                       .invites(new ArrayList<>())
+                       .role(Role.USER)
+                       .createdAt(LocalDateTime.now())
+                       .build();
         var jwtToken = jwtService.generateToken(user);
         var savedUser = repo.save(user);
+        var userFavorites = Favorites.builder()
+                                     .ownerId(user.getId())
+                                     .favorites(new ArrayList<>())
+                                     .build();
+        favoriteRepo.save(userFavorites);
         saveUserToken(savedUser, jwtToken);
         return AuthResponse.builder()
-                .token(jwtToken)
-                .build();
+                           .token(jwtToken)
+                           .build();
     }
 
     public PrivateUserResponse authenticate(AuthRequest req) {
@@ -54,7 +58,8 @@ public class AuthService {
                         req.getPassword()
                 )
                                           );
-        var user = repo.findUserByEmail(req.getEmail()).orElseThrow();
+        var user = repo.findUserByEmail(req.getEmail())
+                       .orElseThrow();
         var jwtToken = jwtService.generateToken(user);
         revokeAllUserTokens(user);
         saveUserToken(user, jwtToken);
@@ -70,12 +75,12 @@ public class AuthService {
 
     private void saveUserToken(User user, String jwtToken) {
         var token = Token.builder()
-                .user(user.getId())
-                .token(jwtToken)
-                .tokenType(TokenType.BEARER)
-                .expired(false)
-                .revoked(false)
-                .build();
+                         .user(user.getId())
+                         .token(jwtToken)
+                         .tokenType(TokenType.BEARER)
+                         .expired(false)
+                         .revoked(false)
+                         .build();
         tokenRepo.save(token);
         user.addTokenToTokens(token);
         repo.save(user);
@@ -101,10 +106,12 @@ public class AuthService {
         }
 
     }
+
     public User returnUserDetailsByToken(String authHeader) {
         String token = authHeader.substring(7);
         String userEmail = jwtService.extractUsername(token);
-        return repo.findUserByEmail(userEmail).orElse(null);
+        return repo.findUserByEmail(userEmail)
+                   .orElse(null);
     }
 
     public PublicUserResponse getUserByToken(String auth) {
@@ -121,7 +128,8 @@ public class AuthService {
     }
 
     public List<PublicUserResponse> getUsersByPrivacy() {
-        List<User> users = repo.findUsersByIsPrivate().orElse(null);
+        List<User> users = repo.findUsersByIsPrivate()
+                               .orElse(null);
         if (users == null) {
             throw new NoSuchElementException();
         }

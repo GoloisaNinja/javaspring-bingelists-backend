@@ -39,13 +39,11 @@ public class BingeList {
         return true;
     }
 
-    public boolean removeMediaItemFromTitles(String mediaId) {
-        for (MediaItem item : this.titles) {
-            if (item.getMediaId().equals(mediaId)) {
-                this.titles.remove(item);
-                reduceMediaCount();
-                return true;
-            }
+    public boolean removeMediaItemFromTitles(MediaItem item) {
+        if (this.titles.contains(item)) {
+            this.titles.remove(item);
+            reduceMediaCount();
+            return true;
         }
         return false;
     }
@@ -84,14 +82,17 @@ public class BingeList {
         return true;
     }
     public MinifiedBingeList getMinifiedBingeList() {
-        Map<String, List<String>> items = new HashMap<>();
-        items.put("movie", new ArrayList<>());
-        items.put("tv", new ArrayList<>());
+        List<String> movies = new ArrayList<>();
+        List<String> tv = new ArrayList<>();
         for (MediaItem title : this.titles) {
-            List<String> listToAddTo = items.get(title.getType());
-            listToAddTo.add(title.getMediaId());
+            String id = title.getMediaId();
+            if (title.getType().equals("movie")) {
+                movies.add(id);
+            } else {
+                tv.add(id);
+            }
         }
-        return new MinifiedBingeList(this.id, this.name, items);
+        return new MinifiedBingeList(this.id, this.name, movies, tv);
     }
 
 }

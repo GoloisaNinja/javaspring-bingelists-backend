@@ -21,7 +21,7 @@ public class MediaItem {
         }
         MediaItem mediaObj = (MediaItem) obj;
         if (mediaObj.getMediaId()
-                    .equals(this.mediaId)) {
+                    .equals(this.mediaId) && mediaObj.getType().equals(this.type)) {
             return true;
         }
         return false;

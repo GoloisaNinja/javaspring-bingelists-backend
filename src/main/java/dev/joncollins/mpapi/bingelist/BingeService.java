@@ -107,7 +107,7 @@ public class BingeService implements GsonTypeAdapter {
         }
     }
 
-    public String removeItemFromBingeList(String id, String item, String auth) throws HttpClientErrorException {
+    public String removeItemFromBingeList(String id, MediaItem item, String auth) throws HttpClientErrorException {
         User user = authService.returnUserDetailsByToken(auth);
         if (user == null) {
             throw new HttpClientErrorException(HttpStatusCode.valueOf(403), "forbidden");
