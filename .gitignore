@@ -37,6 +37,3 @@ build/
 
 ### Spring Resources
 /src/main/resources/secrets.properties
-
-### Docker ignore
-docker-compose.yaml
