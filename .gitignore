@@ -36,4 +36,4 @@ build/
 .env
 
 ### Spring Resources
-/src/main/resources/secrets.properties
+/etc/secrets/secrets.properties
