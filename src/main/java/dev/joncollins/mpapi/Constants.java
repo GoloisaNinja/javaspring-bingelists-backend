@@ -1,6 +1,6 @@
 package dev.joncollins.mpapi;
 
-import dev.joncollins.mpapi.utils.Environment;
+//import dev.joncollins.mpapi.utils.Environment;
 
 public class Constants {
     public static final String baseTMDBURI = "https://api.themoviedb.org/3";
